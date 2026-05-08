@@ -29,6 +29,12 @@ def driver():
 
     options.add_experimental_option("prefs", prefs)
 
+     # Specify the Chromium binary location (important!)
+    options.binary_location = '/usr/bin/chromium'
+    
+    # Set custom cache path to avoid permission issues
+    options.add_argument('--disk-cache-dir=/tmp/chrome-cache')
+
     driver = webdriver.Chrome(options=options)
 
     yield driver   # 👉 test runs here
