@@ -1,6 +1,8 @@
 import pytest
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.chrome.service import Service
+
 
 BASE_URL = "http://18.234.60.194:3000"
 USERNAME = "pytest_selenium"
@@ -14,6 +16,8 @@ def driver():
     # Important for Docker/Jenkins/Linux
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-dev-shm-usage")
+    options.add_argument('--disable-gpu')
+
 
     # Disable notifications
     options.add_argument("--disable-notifications")
@@ -30,12 +34,13 @@ def driver():
     options.add_experimental_option("prefs", prefs)
 
      # Specify the Chromium binary location (important!)
-    options.binary_location = '/usr/bin/chromium'
+    # Disable Selenium Manager - use system chromedriver
+    options.add_argument('--disable-blink-features=AutomationControlled')
     
-    # Set custom cache path to avoid permission issues
-    options.add_argument('--disk-cache-dir=/tmp/chrome-cache')
+    # Specify the chromedriver path explicitly
+    service = Service('/usr/bin/chromedriver')  # Path in your Docker container
 
-    driver = webdriver.Chrome(options=options)
+    driver = webdriver.Chrome(service=service, options=options)
 
     yield driver   # 👉 test runs here
 

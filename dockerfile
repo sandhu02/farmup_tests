@@ -1,13 +1,8 @@
 FROM python:3.11-slim
 
 RUN apt-get update && apt-get install -y \
-    wget \
-    unzip \
-    curl \
-    gnupg \
     chromium \
     chromium-driver \
-     # Add these essential dependencies
     fonts-liberation \
     libasound2 \
     libatk-bridge2.0-0 \
@@ -23,10 +18,9 @@ RUN apt-get update && apt-get install -y \
     libxcomposite1 \
     libxdamage1 \
     libxrandr2 \
-    xdg-utils
-
-# Set environment variable to avoid permission issues
-ENV SELENIUM_MANAGER_CACHE_PATH=/tmp/selenium_cache    
+    xdg-utils \
+    --no-install-recommends \
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
@@ -36,7 +30,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-# Create cache directory with proper permissions
-RUN mkdir -p /tmp/selenium_cache && chmod 777 /tmp/selenium_cache
-
+# No need for selenium cache directory since we're using system chromedriver
+# The Jenkins user will have write permissions to /tmp
 CMD ["pytest", "-v", "--html=report.html"]
